@@ -7,10 +7,10 @@ public class Main {
         List<Node> nodes = new LinkedList<>();
         Node you = new Node("You", false);
         Node bob = new Node("Bob", false);
-        Node claire = new Node("Claire", true);
+        Node claire = new Node("Claire", false);
         Node alice = new Node("Alice", false);
         Node johnny = new Node("Johnny", false);
-        Node thom = new Node("Thom", false);
+        Node thom = new Node("Thom", true);
         Node anuj = new Node("Anuj", false);
         Node peggy = new Node("Peggy", false);
         nodes.add(you);
@@ -41,8 +41,8 @@ public class Main {
         edges.add(alicePeggy);
 
         Graph graph = new Graph(nodes, edges);
-        BFS(graph, you, node -> node.isMangoSeller);
-//        BFS(graph, you, null);
+//        BFS(graph, you, node -> node.isMangoSeller);
+//        DFS(graph, you, node -> node.isMangoSeller);
     }
 
     static class Graph {
@@ -102,19 +102,41 @@ public class Main {
 
     private static void BFS(Graph graph, Node startNode, BreakCondition condition) {
         Set<Node> visited = new HashSet<>();
-        LinkedList<Node> queue = new LinkedList<>();
+        Queue<Node> queue = new LinkedList<>();
         queue.add(startNode);
         while (!queue.isEmpty()) {
-            Node s = queue.poll();
+            Node node = queue.poll();
+            System.out.println("Node " + node.name);
+            if (condition != null && condition.isSeller(node)) {
+                System.out.println("Find seller! " + node.name);
+                break;
+            }
+            List<Node> adjNodes = graph.adjMap.get(node);
+            for (Node adjNode: adjNodes) {
+                if (!visited.contains(adjNode)) {
+                    queue.add(adjNode);
+                    visited.add(adjNode);
+                }
+            }
+        }
+    }
+
+    private static void DFS(Graph graph, Node startNode, BreakCondition condition) {
+        Set<Node> visited = new HashSet<>();
+        LinkedList<Node> queue = new LinkedList<>();
+        queue.push(startNode);
+        while(!queue.isEmpty()) {
+            Node s = queue.pop();
             System.out.println("Node " + s.name);
             if (condition != null && condition.isSeller(s)) {
                 System.out.println("Find seller! " + s.name);
                 break;
             }
+
             List<Node> adjNodes = graph.adjMap.get(s);
             for (Node adjNode: adjNodes) {
                 if (!visited.contains(adjNode)) {
-                    queue.add(adjNode);
+                    queue.push(adjNode);
                     visited.add(adjNode);
                 }
             }
